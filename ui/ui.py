@@ -20,8 +20,18 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import subprocess
 import sys
+
+if 'PYTHON' not in os.environ:
+    os.environ['PYTHON'] = sys.executable
+os.environ.setdefault('PYTHONUTF8', '1')
+
+if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+if sys.stderr and hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
 import threading
 import time
 from datetime import datetime, timezone
@@ -497,7 +507,7 @@ class Console:
         tmp = path.with_suffix(".tmp")
         tmp.write_text("\n".join(lines) + "\n")
         tmp.replace(path)
-        self._cmd(["./helper", "reset"], self.agent)
+        self._cmd(["C:/Program Files/Git/bin/bash.exe", "./helper", "reset"], self.agent)
         return self.info()
 
     def info(self) -> dict:
@@ -613,7 +623,7 @@ class Console:
 
     def describe(self) -> dict:
         out = subprocess.run(
-            ["./helper", "describe"], cwd=self.agent, capture_output=True, text=True
+            ["C:/Program Files/Git/bin/bash.exe", "./helper", "describe"], cwd=self.agent, capture_output=True, text=True
         )
         if out.returncode:
             raise RuntimeError(
@@ -669,7 +679,7 @@ class Console:
         if self.jobs.any_running():
             raise RuntimeError("an agent run is already in progress")
         turns = max(1, min(int(turns), MAX_TURNS))
-        argv = ["./helper", "run", "--turns", str(turns)]
+        argv = ["C:/Program Files/Git/bin/bash.exe", "./helper", "run", "--turns", str(turns)]
         if run_id:
             argv += ["--resume", run_id]
         return self.jobs.start(kind, argv, self.agent, self.runs, run_id)
@@ -695,7 +705,7 @@ class Console:
         self, run_id: str, decision: str, notes: str, request_id: str = ""
     ) -> dict:
         self._run_dir(run_id)
-        argv = ["./helper", "review", run_id]
+        argv = ["C:/Program Files/Git/bin/bash.exe", "./helper", "review", run_id]
         if decision == "answer":
             argv += ["--answer", request_id]
         else:
@@ -710,7 +720,7 @@ class Console:
         if what not in ("memo", "checklist"):
             raise RuntimeError("verify the memo or the checklist")
         out = subprocess.run(
-            ["./helper", "verify", run_id, f"--{what}", "--json"],
+            ["C:/Program Files/Git/bin/bash.exe", "./helper", "verify", run_id, f"--{what}", "--json"],
             cwd=self.agent,
             capture_output=True,
             text=True,
@@ -725,7 +735,7 @@ class Console:
         if self.jobs.any_running():
             raise RuntimeError("wait for the running agent to stop")
         out = subprocess.run(
-            ["./helper", "branch", run_id],
+            ["C:/Program Files/Git/bin/bash.exe", "./helper", "branch", run_id],
             cwd=self.agent,
             capture_output=True,
             text=True,
@@ -738,7 +748,7 @@ class Console:
         if self.jobs.any_running():
             raise RuntimeError("stop the running agent before resetting")
         return self._cmd(
-            ["./helper", "reset"] + (["--clear-runs"] if clear_runs else []), self.agent
+            ["C:/Program Files/Git/bin/bash.exe", "./helper", "reset"] + (["--clear-runs"] if clear_runs else []), self.agent
         )
 
     def _run_dir(self, run_id: str) -> Path:
